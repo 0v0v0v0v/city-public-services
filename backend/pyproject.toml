@@ -2,7 +2,7 @@
 name = "city-public-service-platform"
 version = "0.1.0"
 description = "公益性城市公共便民点位整合平台后端"
-requires-python = ">=3.13,<3.14"
+requires-python = ">=3.11,<4"
 dependencies = [
   "fastapi==0.115.12",
   "uvicorn[standard]==0.34.2",

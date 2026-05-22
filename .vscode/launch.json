@@ -13,7 +13,6 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/backend",
-      "preLaunchTask": "Bootstrap Dev Environment",
       "module": "uvicorn",
       "args": [
         "app.main:app",
@@ -23,18 +22,21 @@
         "--port",
         "8000"
       ],
-      "python": "${workspaceFolder}/backend/.venv/bin/python",
+      "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
       "console": "integratedTerminal",
-      "justMyCode": true
+      "justMyCode": true,
+      "redirectOutput": true,
+      "showReturnValue": false,
+      "stopOnEntry": false,
+      "noDebug": true
     },
     {
       "name": "Frontend: Vite",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/frontend",
-      "preLaunchTask": "Bootstrap Dev Environment",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev", "--host", "127.0.0.1", "--port", "5173"],
+      "runtimeArgs": ["dev"],
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"]
     }
