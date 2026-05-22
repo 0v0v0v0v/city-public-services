@@ -1,0 +1,24 @@
+[project]
+name = "city-public-service-platform"
+version = "0.1.0"
+description = "公益性城市公共便民点位整合平台后端"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "fastapi==0.115.12",
+  "uvicorn[standard]==0.34.2",
+  "sqlalchemy==2.0.41",
+  "python-jose[cryptography]==3.4.0",
+  "passlib[bcrypt]==1.7.4",
+  "pydantic==2.11.5",
+  "python-multipart==0.0.20",
+]
+
+[dependency-groups]
+dev = [
+  "pytest==8.3.5",
+  "httpx==0.28.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

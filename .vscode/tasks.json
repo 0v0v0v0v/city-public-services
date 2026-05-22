@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup Backend (uv)",
+      "type": "shell",
+      "command": "uv sync --dev",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Install Frontend Dependencies",
+      "type": "shell",
+      "command": "pnpm install",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Bootstrap Dev Environment",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Setup Backend (uv)", "Install Frontend Dependencies"],
+      "problemMatcher": []
+    }
+  ]
+}

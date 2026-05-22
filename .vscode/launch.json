@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Full Stack Dev",
+      "configurations": ["Backend: FastAPI", "Frontend: Vite"],
+      "stopAll": true
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Backend: FastAPI",
+      "type": "debugpy",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "preLaunchTask": "Bootstrap Dev Environment",
+      "module": "uvicorn",
+      "args": [
+        "app.main:app",
+        "--reload",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000"
+      ],
+      "python": "${workspaceFolder}/backend/.venv/bin/python",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Frontend: Vite",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "preLaunchTask": "Bootstrap Dev Environment",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev", "--host", "127.0.0.1", "--port", "5173"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
