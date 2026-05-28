@@ -1,14 +1,33 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-const links = [
+import { useAdminStore } from '../stores/admin'
+
+const route = useRoute()
+const store = useAdminStore()
+
+const publicLinks = [
   { label: '首页', to: '/' },
   { label: '分类浏览', to: '/categories' },
   { label: '便民点位', to: '/points' },
   { label: '便民资讯', to: '/news' },
   { label: '项目介绍', to: '/about' },
-  { label: '后台管理', to: '/admin' },
 ]
+
+const adminLinks = [
+  { label: '后台总览', to: '/admin' },
+  { label: '分类管理', to: '/admin/categories' },
+  { label: '点位管理', to: '/admin/points' },
+  { label: '资讯管理', to: '/admin/news' },
+]
+
+const links = computed(() => {
+  if (store.isLoggedIn || route.path.startsWith('/admin')) {
+    return [...publicLinks, ...adminLinks]
+  }
+  return [...publicLinks, { label: '后台管理', to: '/admin' }]
+})
 
 const mobileOpen = ref(false)
 

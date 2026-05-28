@@ -1,8 +1,11 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
 from app.schemas.category import CategoryRead
+
+PointStatus = Literal["draft", "published"]
 
 
 class PointBase(BaseModel):
@@ -15,7 +18,7 @@ class PointBase(BaseModel):
     target_people: str | None = None
     image_url: str | None = None
     is_featured: bool = False
-    status: str = "published"
+    status: PointStatus = "draft"
 
 
 class PointCreate(PointBase):

@@ -49,7 +49,6 @@ a {
 }
 
 .admin-button {
-  width: 100%;
   border: none;
   border-radius: 1rem;
   background: rgb(8 145 178);
@@ -61,4 +60,53 @@ a {
 
 .admin-button:hover {
   background: rgb(14 116 144);
+}
+
+.admin-button-secondary {
+  border: 1px solid rgb(203 213 225);
+  border-radius: 1rem;
+  background: white;
+  padding: 0.8rem 1rem;
+  color: rgb(51 65 85);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-button-secondary:hover {
+  border-color: rgb(148 163 184);
+  background: rgb(248 250 252);
+}
+
+.admin-button-danger {
+  border: none;
+  border-radius: 1rem;
+  background: rgb(225 29 72);
+  padding: 0.8rem 1rem;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-button-danger:hover {
+  background: rgb(190 24 93);
+}
+
+.admin-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.admin-chip-draft {
+  background: rgb(241 245 249);
+  color: rgb(71 85 105);
+}
+
+.admin-chip-published {
+  background: rgb(209 250 229);
+  color: rgb(6 95 70);
 }

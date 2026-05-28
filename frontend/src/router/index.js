@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import AboutView from '../views/AboutView.vue'
+import AdminCategoriesView from '../views/admin/AdminCategoriesView.vue'
 import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
 import AdminLoginView from '../views/admin/AdminLoginView.vue'
+import AdminNewsView from '../views/admin/AdminNewsView.vue'
+import AdminPointsView from '../views/admin/AdminPointsView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
 import HomeView from '../views/HomeView.vue'
 import NewsDetailView from '../views/NewsDetailView.vue'
@@ -22,6 +25,21 @@ const routes = [
   {
     path: '/admin',
     component: AdminDashboardView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/categories',
+    component: AdminCategoriesView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/points',
+    component: AdminPointsView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/news',
+    component: AdminNewsView,
     meta: { requiresAuth: true },
   },
 ]

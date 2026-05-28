@@ -21,3 +21,10 @@ class CategoryUpdate(CategoryBase):
 class CategoryRead(CategoryBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+
+class CategoryOption(BaseModel):
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
