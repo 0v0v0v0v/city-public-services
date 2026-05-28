@@ -1,11 +1,44 @@
-from fastapi.testclient import TestClient
+import tempfile
+from pathlib import Path
 from uuid import uuid4
 
-from app.db.init_db import init_db  # noqa: E402
-from app.main import app  # noqa: E402
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
+from app.api.deps import get_db
+from app.db.base import Base
+from app.main import app
+from app.seed.data import seed_data
+
+
+TEMP_DIR = tempfile.TemporaryDirectory()
+TEST_DB_PATH = Path(TEMP_DIR.name) / "test_app.db"
+TEST_DATABASE_URL = f"sqlite:///{TEST_DB_PATH}"
+engine = create_engine(
+    TEST_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base.metadata.create_all(bind=engine)
+db = TestingSessionLocal()
+try:
+    seed_data(db)
+finally:
+    db.close()
+
+
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
-init_db()
 
 
 def get_token():
@@ -181,10 +214,11 @@ def test_admin_create_point_visible_in_public_search():
     headers = get_headers()
     categories = client.get("/api/admin/categories/options", headers=headers).json()
     category_id = categories[0]["id"]
+    unique_suffix = uuid4().hex[:8]
     create_response = client.post(
         "/api/admin/points",
         json={
-            "name": "晨曦公益运动角",
+            "name": f"晨曦公益运动角-{unique_suffix}",
             "category_id": category_id,
             "address": "松风路 18 号口袋公园内",
             "opening_hours": "全天开放",
@@ -199,7 +233,7 @@ def test_admin_create_point_visible_in_public_search():
     )
     assert create_response.status_code == 201
 
-    search_response = client.get("/api/points", params={"keyword": "晨曦公益运动角"})
+    search_response = client.get("/api/points", params={"keyword": unique_suffix})
     assert search_response.status_code == 200
     assert search_response.json()["total"] >= 1
 
