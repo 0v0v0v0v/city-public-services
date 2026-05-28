@@ -2,7 +2,6 @@ from app.core.config import settings
 from app.core.security import get_password_hash
 from app.models.admin_user import AdminUser
 from app.models.category import Category
-from app.models.news import News
 from app.models.point import Point
 
 
@@ -36,7 +35,7 @@ def seed_data(db) -> None:
                 slug="government-service",
                 icon="service",
                 sort_order=3,
-                description="集中办理政务事项、便民审批和咨询服务。",
+                description="集中办理政务事项、便民审批和窗口服务。",
             ),
             Category(
                 name="公共卫生间",
@@ -78,7 +77,7 @@ def seed_data(db) -> None:
                     category_id=categories[2].id,
                     address="政务路 1 号市民中心一层",
                     opening_hours="周一至周五 09:00-17:00",
-                    description="可集中办理社保、公积金、户籍咨询等常见事项，现场设有导办服务。",
+                    description="可集中办理社保、公积金、户籍等常见事项，现场设有导办服务。",
                     service_content="政务咨询、材料受理、自助打印",
                     target_people="全体市民",
                     image_url="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
@@ -89,32 +88,11 @@ def seed_data(db) -> None:
                     category_id=categories[3].id,
                     address="人民广场东入口旁",
                     opening_hours="06:00-22:00",
-                    description="靠近地铁口与广场主通道，配有无障碍厕位和母婴护理台。",
+                    description="临近地铁口与广场主通道，配有无障碍厕位和母婴护理台。",
                     service_content="免费卫生设施、无障碍服务",
                     target_people="市民、游客、老年人、儿童",
                     image_url="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
                     is_featured=True,
-                ),
-            ]
-        )
-
-    if not db.query(News).first():
-        db.add_all(
-            [
-                News(
-                    title="本周末社区公益书屋延长开放时间",
-                    summary="部分社区书屋周末延长至晚间 8 点，方便居民借阅和参与阅读活动。",
-                    content="为了满足居民周末阅读需求，多个社区公益书屋将在本周末延长开放时间，并增加亲子阅读活动场次。",
-                ),
-                News(
-                    title="便民服务点新增无障碍设施巡检安排",
-                    summary="多个便民点位启动无障碍设施检查与维护，提升特殊群体使用便利性。",
-                    content="市级公共服务部门已安排本月无障碍设施巡检计划，涵盖公园、政务大厅和公共卫生间等场所。",
-                ),
-                News(
-                    title="夏季高温期间公共避暑场所名单公布",
-                    summary="社区中心、图书空间和部分体育馆将作为临时避暑开放点位。",
-                    content="为应对高温天气，多个社区中心与公共阅读空间将在白天对外开放，为居民提供休息和饮水服务。",
                 ),
             ]
         )

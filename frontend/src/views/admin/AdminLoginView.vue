@@ -31,7 +31,7 @@ async function submit() {
   <section class="mx-auto max-w-xl rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
     <p class="text-sm font-medium uppercase tracking-[0.2em] text-cyan-700">后台管理</p>
     <h1 class="mt-4 text-3xl font-semibold text-slate-900">管理员登录</h1>
-    <p class="mt-3 text-sm leading-6 text-slate-500">默认演示账号为 `admin / admin123`，登录后可维护分类、点位和资讯。</p>
+    <p class="mt-3 text-sm leading-6 text-slate-500">默认演示账号为 `admin / admin123`，登录后可维护分类和点位。</p>
     <form class="mt-8 space-y-4" @submit.prevent="submit">
       <input
         v-model="form.username"

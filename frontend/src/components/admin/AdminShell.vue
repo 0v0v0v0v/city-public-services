@@ -22,7 +22,6 @@ const navItems = [
   { label: '后台总览', to: '/admin', description: '查看数据规模和管理入口。' },
   { label: '分类管理', to: '/admin/categories', description: '维护分类名称、排序和展示说明。' },
   { label: '点位管理', to: '/admin/points', description: '维护点位详情、推荐位和发布状态。' },
-  { label: '资讯管理', to: '/admin/news', description: '维护资讯正文、摘要和发布状态。' },
 ]
 
 function logout() {
@@ -54,7 +53,7 @@ function logout() {
         </div>
       </div>
 
-      <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         <RouterLink
           v-for="item in navItems"
           :key="item.to"

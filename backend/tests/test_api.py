@@ -238,7 +238,7 @@ def test_admin_create_point_visible_in_public_search():
     assert search_response.json()["total"] >= 1
 
 
-def test_admin_point_and_news_filters_and_draft_visibility():
+def test_admin_point_filters_and_draft_visibility():
     headers = get_headers()
     categories = client.get("/api/admin/categories/options", headers=headers).json()
     category_id = categories[0]["id"]
@@ -297,47 +297,6 @@ def test_admin_point_and_news_filters_and_draft_visibility():
     assert public_point_list.status_code == 200
     assert public_point_list.json()["total"] >= 1
 
-    news_response = client.post(
-        "/api/admin/news",
-        json={
-            "title": f"草稿资讯-{unique_suffix}",
-            "summary": "草稿资讯摘要",
-            "content": "草稿资讯正文",
-            "status": "draft",
-        },
-        headers=headers,
-    )
-    assert news_response.status_code == 201
-    news_id = news_response.json()["id"]
-
-    admin_news_list = client.get(
-        "/api/admin/news",
-        params={"keyword": unique_suffix, "status": "draft"},
-        headers=headers,
-    )
-    assert admin_news_list.status_code == 200
-    assert admin_news_list.json()["total"] >= 1
-
-    public_news_list = client.get("/api/news")
-    assert public_news_list.status_code == 200
-    assert all(item["title"] != f"草稿资讯-{unique_suffix}" for item in public_news_list.json()["items"])
-
-    publish_news_response = client.put(
-        f"/api/admin/news/{news_id}",
-        json={
-            "title": f"草稿资讯-{unique_suffix}",
-            "summary": "草稿资讯摘要",
-            "content": "草稿资讯正文",
-            "status": "published",
-        },
-        headers=headers,
-    )
-    assert publish_news_response.status_code == 200
-
-    public_news_list = client.get("/api/news")
-    assert public_news_list.status_code == 200
-    assert any(item["title"] == f"草稿资讯-{unique_suffix}" for item in public_news_list.json()["items"])
-
 
 def test_admin_lists_load_successfully():
     headers = get_headers()
@@ -354,8 +313,40 @@ def test_admin_lists_load_successfully():
     assert "items" in points_payload
     assert "total" in points_payload
 
-    news_response = client.get("/api/admin/news", headers=headers)
-    assert news_response.status_code == 200
-    news_payload = news_response.json()
-    assert "items" in news_payload
-    assert "total" in news_payload
+
+def test_point_address_fields_round_trip():
+    headers = get_headers()
+    categories = client.get("/api/admin/categories/options", headers=headers).json()
+    category_id = categories[0]["id"]
+    unique_suffix = uuid4().hex[:8]
+
+    create_response = client.post(
+        "/api/admin/points",
+        json={
+            "name": f"Address Test {unique_suffix}",
+            "category_id": category_id,
+            "district": "Haidian",
+            "street": "Zhongguancun Street",
+            "address": "No. 1 Service Road",
+            "landmark": "Next to Library",
+            "navigation_notes": "Enter from the east gate and walk straight for 100 meters.",
+            "opening_hours": "09:00-18:00",
+            "description": "Address field round trip test",
+            "service_content": "Testing service content",
+            "target_people": "Residents",
+            "image_url": "",
+            "is_featured": False,
+            "status": "published",
+        },
+        headers=headers,
+    )
+    assert create_response.status_code == 201
+    payload = create_response.json()
+    assert payload["district"] == "Haidian"
+    assert payload["street"] == "Zhongguancun Street"
+    assert payload["landmark"] == "Next to Library"
+    assert payload["navigation_notes"] == "Enter from the east gate and walk straight for 100 meters."
+
+    public_response = client.get("/api/points", params={"keyword": unique_suffix})
+    assert public_response.status_code == 200
+    assert public_response.json()["items"][0]["district"] == "Haidian"

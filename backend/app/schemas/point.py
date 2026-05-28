@@ -11,7 +11,11 @@ PointStatus = Literal["draft", "published"]
 class PointBase(BaseModel):
     name: str
     category_id: int
+    district: str | None = None
+    street: str | None = None
     address: str
+    landmark: str | None = None
+    navigation_notes: str | None = None
     opening_hours: str | None = None
     description: str
     service_content: str | None = None

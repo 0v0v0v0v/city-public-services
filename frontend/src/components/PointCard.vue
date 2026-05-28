@@ -2,6 +2,10 @@
 defineProps({
   point: Object,
 })
+
+function formatArea(point) {
+  return [point.district, point.street].filter(Boolean).join(' / ')
+}
 </script>
 
 <template>
@@ -24,7 +28,9 @@ defineProps({
       <h3 class="mt-3 text-xl font-semibold text-slate-900">{{ point.name }}</h3>
       <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">{{ point.description }}</p>
       <div class="mt-4 text-sm text-slate-500">
-        <p>{{ point.address }}</p>
+        <p v-if="formatArea(point)">{{ formatArea(point) }}</p>
+        <p class="mt-1">{{ point.address }}</p>
+        <p v-if="point.landmark" class="mt-1">附近地标：{{ point.landmark }}</p>
         <p class="mt-1">{{ point.opening_hours || '开放时间以现场公告为准' }}</p>
       </div>
     </div>

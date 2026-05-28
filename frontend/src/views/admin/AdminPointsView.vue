@@ -46,7 +46,7 @@ const form = ref(createPointForm())
 const columns = [
   { key: 'name', label: '点位名称' },
   { key: 'category', label: '所属分类', slot: 'cell-category' },
-  { key: 'address', label: '地址', className: 'max-w-sm' },
+  { key: 'address', label: '地址信息', className: 'max-w-sm' },
   { key: 'status', label: '状态' },
   { key: 'is_featured', label: '推荐' },
   { key: 'updated_at', label: '更新时间' },
@@ -57,7 +57,11 @@ function createPointForm() {
   return {
     name: '',
     category_id: '',
+    district: '',
+    street: '',
     address: '',
+    landmark: '',
+    navigation_notes: '',
     opening_hours: '',
     description: '',
     service_content: '',
@@ -72,7 +76,11 @@ function pointPayload(source, overrides = {}) {
   return {
     name: source.name,
     category_id: Number(source.category_id),
+    district: source.district || '',
+    street: source.street || '',
     address: source.address,
+    landmark: source.landmark || '',
+    navigation_notes: source.navigation_notes || '',
     opening_hours: source.opening_hours || '',
     description: source.description,
     service_content: source.service_content || '',
@@ -145,7 +153,6 @@ async function loadPoints() {
     const totalPages = Math.max(1, Math.ceil(data.total / pageSize) || 1)
     if (!data.items.length && data.total > 0 && filters.value.page > totalPages) {
       changePage(totalPages)
-      return
     }
   } catch (err) {
     handleAuthError(err, '点位列表加载失败，请稍后重试。')
@@ -169,7 +176,11 @@ async function openEdit(row) {
     form.value = {
       name: data.name,
       category_id: String(data.category_id),
+      district: data.district || '',
+      street: data.street || '',
       address: data.address,
+      landmark: data.landmark || '',
+      navigation_notes: data.navigation_notes || '',
       opening_hours: data.opening_hours || '',
       description: data.description,
       service_content: data.service_content || '',
@@ -295,16 +306,20 @@ onMounted(async () => {
 <template>
   <AdminShell
     title="点位管理"
-    description="维护点位详情、分类归属和发布状态。前台只展示已发布内容，因此可以先以草稿保存后再上线。"
+    description="维护点位详情、地址信息和发布状态。前台只展示已发布内容，所以可以先保存草稿，再逐步完善。"
   >
     <section class="space-y-5">
-      <SectionTitle title="点位列表" subtitle="支持关键词、分类和状态筛选，并可直接切换草稿/发布状态。">
+      <SectionTitle title="点位列表" subtitle="支持关键词、分类和状态筛选，也可以直接切换草稿和发布状态。">
         <button class="admin-button-secondary w-auto px-5" @click="openCreate">新建点位</button>
       </SectionTitle>
 
       <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
         <form class="grid gap-3 xl:grid-cols-[1.3fr_0.9fr_0.7fr_auto]" @submit.prevent="submitFilters">
-          <input v-model="filters.keyword" class="admin-input" placeholder="按名称、地址、简介或服务内容搜索" />
+          <input
+            v-model="filters.keyword"
+            class="admin-input"
+            placeholder="按名称、地址、简介或服务内容搜索"
+          />
           <select v-model="filters.category_id" class="admin-input">
             <option value="">全部分类</option>
             <option v-for="category in categoryOptions" :key="category.id" :value="String(category.id)">
@@ -335,13 +350,19 @@ onMounted(async () => {
           :rows="rows"
           :loading="loading"
           empty-title="暂无点位"
-          empty-description="可以先新建一个点位，完善基础服务信息后再发布到前台。"
+          empty-description="可以先新建一个点位，把地址、服务信息和开放时间录进去。"
         >
           <template #cell-category="{ row }">
-            {{ row.category?.name || '—' }}
+            {{ row.category?.name || '未分类' }}
           </template>
           <template #cell-address="{ row }">
-            <p class="line-clamp-3 text-sm leading-6 text-slate-600">{{ row.address }}</p>
+            <div class="space-y-1 text-sm leading-6 text-slate-600">
+              <p class="line-clamp-2">
+                {{ [row.district, row.street].filter(Boolean).join(' / ') || '未填写区域信息' }}
+              </p>
+              <p class="line-clamp-2">{{ row.address }}</p>
+              <p v-if="row.landmark" class="line-clamp-2 text-xs text-slate-500">附近地标：{{ row.landmark }}</p>
+            </div>
           </template>
           <template #cell-status="{ row }">
             <AdminStatusBadge :value="row.status" />
@@ -360,7 +381,7 @@ onMounted(async () => {
                 :disabled="togglingId === row.id"
                 @click="toggleStatus(row)"
               >
-                {{ togglingId === row.id ? '切换中…' : row.status === 'published' ? '转为草稿' : '立即发布' }}
+                {{ togglingId === row.id ? '切换中...' : row.status === 'published' ? '转为草稿' : '立即发布' }}
               </button>
               <button class="admin-button-danger w-auto px-4 py-2 text-sm" @click="askDelete(row)">删除</button>
             </div>
@@ -380,7 +401,7 @@ onMounted(async () => {
     <AdminDialog
       v-model="dialogOpen"
       :title="editingId ? '编辑点位' : '新建点位'"
-      description="建议优先保证名称、地址、开放时间和简介完整，再根据演示需要补充服务内容与图片。"
+      description="建议优先把点位地址写具体：区、街道、详细地址、附近地标和怎么走。这样普通人更容易找到。"
     >
       <form class="space-y-4" @submit.prevent="submitForm">
         <div class="grid gap-4 md:grid-cols-2">
@@ -391,7 +412,14 @@ onMounted(async () => {
               {{ category.name }}
             </option>
           </select>
+          <input v-model="form.district" class="admin-input" placeholder="所在区域，如：朝阳区" />
+          <input v-model="form.street" class="admin-input" placeholder="街道 / 片区" />
           <input v-model="form.address" required class="admin-input md:col-span-2" placeholder="详细地址" />
+          <input
+            v-model="form.landmark"
+            class="admin-input md:col-span-2"
+            placeholder="附近地标，如：地铁口、公交站、社区服务中心"
+          />
           <input v-model="form.opening_hours" class="admin-input" placeholder="开放时间" />
           <select v-model="form.status" class="admin-input">
             <option value="draft">草稿</option>
@@ -400,6 +428,12 @@ onMounted(async () => {
         </div>
         <textarea v-model="form.description" rows="4" required class="admin-input" placeholder="点位简介"></textarea>
         <textarea v-model="form.service_content" rows="4" class="admin-input" placeholder="服务内容"></textarea>
+        <textarea
+          v-model="form.navigation_notes"
+          rows="3"
+          class="admin-input"
+          placeholder="导航提示，如：从东门进入后右转 100 米，看到蓝色门头就是"
+        ></textarea>
         <div class="grid gap-4 md:grid-cols-2">
           <input v-model="form.target_people" class="admin-input" placeholder="适用人群" />
           <input v-model="form.image_url" class="admin-input" placeholder="图片链接" />
@@ -411,7 +445,7 @@ onMounted(async () => {
         <p v-if="formError" class="text-sm text-rose-600">{{ formError }}</p>
         <div class="flex flex-wrap justify-end gap-3">
           <button type="button" class="admin-button-secondary w-auto px-5" @click="dialogOpen = false">取消</button>
-          <button class="admin-button w-auto px-5" :disabled="submitting">{{ submitting ? '保存中…' : '保存点位' }}</button>
+          <button class="admin-button w-auto px-5" :disabled="submitting">{{ submitting ? '保存中...' : '保存点位' }}</button>
         </div>
       </form>
     </AdminDialog>

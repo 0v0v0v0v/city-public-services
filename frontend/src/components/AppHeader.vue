@@ -1,33 +1,14 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-
-import { useAdminStore } from '../stores/admin'
-
-const route = useRoute()
-const store = useAdminStore()
+import { ref } from 'vue'
 
 const publicLinks = [
   { label: '首页', to: '/' },
   { label: '分类浏览', to: '/categories' },
   { label: '便民点位', to: '/points' },
-  { label: '便民资讯', to: '/news' },
   { label: '项目介绍', to: '/about' },
 ]
 
-const adminLinks = [
-  { label: '后台总览', to: '/admin' },
-  { label: '分类管理', to: '/admin/categories' },
-  { label: '点位管理', to: '/admin/points' },
-  { label: '资讯管理', to: '/admin/news' },
-]
-
-const links = computed(() => {
-  if (store.isLoggedIn || route.path.startsWith('/admin')) {
-    return [...publicLinks, ...adminLinks]
-  }
-  return [...publicLinks, { label: '后台管理', to: '/admin' }]
-})
+const links = publicLinks
 
 const mobileOpen = ref(false)
 
@@ -49,7 +30,7 @@ function closeMenu() {
         </div>
         <div>
           <div class="text-lg font-semibold">城市公共便民点位整合平台</div>
-          <div class="text-xs text-slate-500">公益导向的民生服务信息入口</div>
+          <div class="text-xs text-slate-500">面向市民的公益型服务信息入口</div>
         </div>
       </RouterLink>
       <nav class="hidden gap-5 text-sm font-medium text-slate-600 lg:flex">

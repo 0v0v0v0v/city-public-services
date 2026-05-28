@@ -4,10 +4,8 @@ from sqlalchemy.orm import joinedload
 
 from app.api.deps import get_current_admin, get_db
 from app.models.category import Category
-from app.models.news import News
 from app.models.point import Point
 from app.schemas.category import CategoryCreate, CategoryOption, CategoryUpdate
-from app.schemas.news import NewsCreate, NewsUpdate
 from app.schemas.point import PointCreate, PointUpdate
 from app.services.query import paginate
 
@@ -19,7 +17,6 @@ def dashboard(_: object = Depends(get_current_admin), db=Depends(get_db)):
     return {
         "category_count": db.query(Category).count(),
         "point_count": db.query(Point).count(),
-        "news_count": db.query(News).count(),
     }
 
 
@@ -203,69 +200,3 @@ def delete_point(point_id: int, _: object = Depends(get_current_admin), db=Depen
     db.delete(item)
     db.commit()
     return {"message": "点位已删除。"}
-
-
-@router.get("/news")
-def admin_list_news(
-    keyword: str | None = None,
-    status: str | None = Query(default=None),
-    page: int = 1,
-    page_size: int = 20,
-    _: object = Depends(get_current_admin),
-    db=Depends(get_db),
-):
-    query = db.query(News)
-    if keyword:
-        pattern = f"%{keyword.strip()}%"
-        query = query.filter(
-            (News.title.ilike(pattern))
-            | (News.summary.ilike(pattern))
-            | (News.content.ilike(pattern))
-        )
-    if status:
-        query = query.filter(News.status == status)
-    query = query.order_by(News.published_at.desc(), News.id.desc())
-    page_size = min(page_size, 100)
-    items, total = paginate(query, page, page_size)
-    return {"items": items, "total": total, "page": page, "page_size": page_size}
-
-
-@router.get("/news/{news_id}")
-def admin_get_news(news_id: int, _: object = Depends(get_current_admin), db=Depends(get_db)):
-    item = db.query(News).filter(News.id == news_id).first()
-    if not item:
-        raise HTTPException(status_code=404, detail="资讯不存在。")
-    return item
-
-
-@router.post("/news", status_code=http_status.HTTP_201_CREATED)
-def create_news(payload: NewsCreate, _: object = Depends(get_current_admin), db=Depends(get_db)):
-    item = News(**payload.model_dump())
-    db.add(item)
-    db.commit()
-    db.refresh(item)
-    return item
-
-
-@router.put("/news/{news_id}")
-def update_news(
-    news_id: int, payload: NewsUpdate, _: object = Depends(get_current_admin), db=Depends(get_db)
-):
-    item = db.query(News).filter(News.id == news_id).first()
-    if not item:
-        raise HTTPException(status_code=404, detail="资讯不存在。")
-    for key, value in payload.model_dump().items():
-        setattr(item, key, value)
-    db.commit()
-    db.refresh(item)
-    return item
-
-
-@router.delete("/news/{news_id}")
-def delete_news(news_id: int, _: object = Depends(get_current_admin), db=Depends(get_db)):
-    item = db.query(News).filter(News.id == news_id).first()
-    if not item:
-        raise HTTPException(status_code=404, detail="资讯不存在。")
-    db.delete(item)
-    db.commit()
-    return {"message": "资讯已删除。"}
