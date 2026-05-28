@@ -28,6 +28,7 @@ def apply_point_filters(
 
 
 def paginate(query: Query, page: int, page_size: int) -> tuple[list, int]:
-    total = query.with_entities(func.count()).scalar() or 0
+    count_query = query.order_by(None).enable_eagerloads(False)
+    total = count_query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
     return items, total

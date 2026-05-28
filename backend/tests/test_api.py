@@ -99,3 +99,20 @@ def test_admin_create_point_visible_in_public_search():
     search_response = client.get("/api/points", params={"keyword": "晨曦公益运动角"})
     assert search_response.status_code == 200
     assert search_response.json()["total"] >= 1
+
+
+def test_admin_lists_load_successfully():
+    token = get_token()
+    headers = {"Authorization": f"Bearer {token}"}
+
+    points_response = client.get("/api/admin/points", headers=headers)
+    assert points_response.status_code == 200
+    points_payload = points_response.json()
+    assert "items" in points_payload
+    assert "total" in points_payload
+
+    news_response = client.get("/api/admin/news", headers=headers)
+    assert news_response.status_code == 200
+    news_payload = news_response.json()
+    assert "items" in news_payload
+    assert "total" in news_payload

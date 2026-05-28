@@ -7,10 +7,17 @@ export default defineConfig({
   server: {
     host: '127.0.0.1',
     port: 5173,
+    strictPort: true,
     hmr: {
       host: 'localhost',
       port: 5173,
       protocol: 'ws'
+    },
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
     },
     watch: {
       usePolling: true,

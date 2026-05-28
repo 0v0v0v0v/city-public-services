@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+import socket
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.api.admin import router as admin_router
@@ -16,6 +17,15 @@ from app.db.init_db import init_db
 BASE_DIR = Path(__file__).resolve().parents[2]
 FRONTEND_DIST_DIR = BASE_DIR / "frontend" / "dist"
 FRONTEND_INDEX_FILE = FRONTEND_DIST_DIR / "index.html"
+FRONTEND_DEV_URL = "http://127.0.0.1:5173"
+
+
+def is_frontend_dev_server_running() -> bool:
+    try:
+        with socket.create_connection(("127.0.0.1", 5173), timeout=0.15):
+            return True
+    except OSError:
+        return False
 
 
 @asynccontextmanager
@@ -50,6 +60,8 @@ def health_check():
 
 @app.get("/favicon.svg")
 def favicon():
+    if is_frontend_dev_server_running():
+        return RedirectResponse(f"{FRONTEND_DEV_URL}/favicon.svg")
     if (FRONTEND_DIST_DIR / "favicon.svg").exists():
         return FileResponse(FRONTEND_DIST_DIR / "favicon.svg")
     return JSONResponse(status_code=404, content={"detail": "Not found."})
@@ -57,6 +69,8 @@ def favicon():
 
 @app.get("/icons.svg")
 def icons():
+    if is_frontend_dev_server_running():
+        return RedirectResponse(f"{FRONTEND_DEV_URL}/icons.svg")
     if (FRONTEND_DIST_DIR / "icons.svg").exists():
         return FileResponse(FRONTEND_DIST_DIR / "icons.svg")
     return JSONResponse(status_code=404, content={"detail": "Not found."})
@@ -66,6 +80,11 @@ def icons():
 def serve_frontend(full_path: str):
     if full_path.startswith("api/"):
         return JSONResponse(status_code=404, content={"detail": "API endpoint not found."})
+
+    if is_frontend_dev_server_running():
+        target_path = full_path or ""
+        suffix = f"/{target_path}" if target_path else ""
+        return RedirectResponse(f"{FRONTEND_DEV_URL}{suffix}")
 
     if FRONTEND_INDEX_FILE.exists():
         requested_file = FRONTEND_DIST_DIR / full_path
