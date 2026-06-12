@@ -1,3 +1,5 @@
+import atexit
+import shutil
 import tempfile
 from pathlib import Path
 from uuid import uuid4
@@ -9,7 +11,8 @@ from sqlalchemy.orm import sessionmaker
 from app.api.deps import get_db
 from app.db.base import Base
 from app.main import app
-from app.seed.data import seed_data
+from app.models.point import Point
+from app.seed.data import DEFAULT_POINTS, seed_data
 
 
 TEMP_DIR = tempfile.TemporaryDirectory()
@@ -41,6 +44,14 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
+def cleanup_test_db():
+    engine.dispose()
+    shutil.rmtree(TEMP_DIR.name, ignore_errors=True)
+
+
+atexit.register(cleanup_test_db)
+
+
 def get_token():
     response = client.post(
         "/api/admin/auth/login",
@@ -53,6 +64,92 @@ def get_token():
 def get_headers():
     token = get_token()
     return {"Authorization": f"Bearer {token}"}
+
+
+def test_seeded_government_service_centers_are_publicly_available():
+    response = client.get("/api/points", params={"keyword": "金牛政务中心", "page_size": 20})
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 2
+    assert {item["district"] for item in payload["items"]} == {"金牛区"}
+
+    city_response = client.get("/api/points", params={"keyword": "政务服务中心", "page_size": 20})
+    assert city_response.status_code == 200
+    names = {item["name"] for item in city_response.json()["items"]}
+    assert "成都市人民政府政务服务中心" in names
+    assert "成华区人民政府政务服务中心" in names
+
+
+def test_seeded_park_locations_are_publicly_available():
+    response = client.get("/api/points", params={"keyword": "摄影公园", "page_size": 20})
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] >= 1
+    assert any(item["name"] == "府河摄影公园" for item in payload["items"])
+
+    park_response = client.get("/api/points", params={"keyword": "凤凰山公园", "page_size": 20})
+    assert park_response.status_code == 200
+    park_items = park_response.json()["items"]
+    assert any(item["district"] == "金牛区" for item in park_items)
+
+
+def test_seeded_community_service_locations_are_publicly_available():
+    response = client.get("/api/points", params={"keyword": "社区卫生服务中心", "page_size": 50})
+    assert response.status_code == 200
+    payload = response.json()
+    names = {item["name"] for item in payload["items"]}
+    assert "营门口社区卫生服务中心" in names
+    assert "荷花池社区卫生服务中心" in names
+
+    service_response = client.get("/api/points", params={"keyword": "西华街道综合便民服务中心", "page_size": 20})
+    assert service_response.status_code == 200
+    assert any(item["name"] == "西华街道综合便民服务中心" for item in service_response.json()["items"])
+
+    elder_response = client.get("/api/points", params={"keyword": "友联社区养老服务中心", "page_size": 20})
+    assert elder_response.status_code == 200
+    assert any(item["name"] == "沙河源街道友联社区养老服务中心" for item in elder_response.json()["items"])
+
+
+def test_seeded_public_restrooms_are_drafts_visible_only_in_admin():
+    headers = get_headers()
+
+    admin_response = client.get(
+        "/api/admin/points",
+        params={"keyword": "九里堤北路1号附2号公共卫生间", "status": "draft", "page_size": 20},
+        headers=headers,
+    )
+    assert admin_response.status_code == 200
+    admin_items = admin_response.json()["items"]
+    assert any(item["name"] == "九里堤北路1号附2号公共卫生间" for item in admin_items)
+
+    public_response = client.get("/api/points", params={"keyword": "九里堤北路1号附2号公共卫生间"})
+    assert public_response.status_code == 200
+    assert public_response.json()["total"] == 0
+
+
+def test_seed_data_does_not_duplicate_default_points():
+    temp_dir = tempfile.TemporaryDirectory()
+    test_db_path = Path(temp_dir.name) / "seed_idempotent.db"
+    test_engine = create_engine(
+        f"sqlite:///{test_db_path}",
+        connect_args={"check_same_thread": False},
+    )
+    testing_session = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+    Base.metadata.create_all(bind=test_engine)
+
+    db = testing_session()
+    try:
+        seed_data(db)
+        first_count = db.query(Point).count()
+        seed_data(db)
+        second_count = db.query(Point).count()
+    finally:
+        db.close()
+        test_engine.dispose()
+        temp_dir.cleanup()
+
+    assert first_count == len(DEFAULT_POINTS)
+    assert second_count == len(DEFAULT_POINTS)
 
 
 def test_public_points_filtering():
