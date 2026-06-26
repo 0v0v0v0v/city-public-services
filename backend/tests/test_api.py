@@ -75,9 +75,15 @@ def test_seeded_government_service_centers_are_publicly_available():
 
     city_response = client.get("/api/points", params={"keyword": "政务服务中心", "page_size": 20})
     assert city_response.status_code == 200
-    names = {item["name"] for item in city_response.json()["items"]}
+    city_items = city_response.json()["items"]
+    names = {item["name"] for item in city_items}
     assert "成都市人民政府政务服务中心" in names
     assert "成华区人民政府政务服务中心" in names
+    assert any(
+        item["name"] == "成都市人民政府政务服务中心"
+        and item["image_url"] == "/service-scenes/chengdu-government-service-center.svg"
+        for item in city_items
+    )
 
 
 def test_seeded_park_locations_are_publicly_available():
@@ -92,6 +98,14 @@ def test_seeded_park_locations_are_publicly_available():
     park_items = park_response.json()["items"]
     assert any(item["district"] == "金牛区" for item in park_items)
 
+    shaheyuan_response = client.get("/api/points", params={"keyword": "沙河源公园", "page_size": 20})
+    assert shaheyuan_response.status_code == 200
+    assert any(
+        item["name"] == "沙河源公园"
+        and item["image_url"] == "/park-scenes/shaheyuan-park.svg"
+        for item in shaheyuan_response.json()["items"]
+    )
+
 
 def test_seeded_community_service_locations_are_publicly_available():
     response = client.get("/api/points", params={"keyword": "社区卫生服务中心", "page_size": 50})
@@ -103,28 +117,60 @@ def test_seeded_community_service_locations_are_publicly_available():
 
     service_response = client.get("/api/points", params={"keyword": "西华街道综合便民服务中心", "page_size": 20})
     assert service_response.status_code == 200
-    assert any(item["name"] == "西华街道综合便民服务中心" for item in service_response.json()["items"])
+    service_items = service_response.json()["items"]
+    assert any(item["name"] == "西华街道综合便民服务中心" for item in service_items)
+    assert any(
+        item["name"] == "西华街道综合便民服务中心"
+        and item["image_url"].startswith("https://ts1.tc.mm.bing.net/th/id/R-C.b80d276f4bc796595bfe2657c0526761")
+        for item in service_items
+    )
 
     elder_response = client.get("/api/points", params={"keyword": "友联社区养老服务中心", "page_size": 20})
     assert elder_response.status_code == 200
-    assert any(item["name"] == "沙河源街道友联社区养老服务中心" for item in elder_response.json()["items"])
+    elder_items = elder_response.json()["items"]
+    assert any(item["name"] == "沙河源街道友联社区养老服务中心" for item in elder_items)
+    assert any(
+        item["name"] == "沙河源街道友联社区养老服务中心"
+        and item["image_url"].startswith("https://ts3.tc.mm.bing.net/th/id/OIP-C.FJ13dAdN3kzDjohhj5t7zgHaFj")
+        for item in elder_items
+    )
 
 
-def test_seeded_public_restrooms_are_drafts_visible_only_in_admin():
+def test_seeded_public_restrooms_are_publicly_available():
+    public_response = client.get("/api/points", params={"keyword": "九里堤北路1号附2号公共卫生间", "page_size": 20})
+    assert public_response.status_code == 200
+    public_items = public_response.json()["items"]
+    assert any(item["name"] == "九里堤北路1号附2号公共卫生间" for item in public_items)
+    assert any(
+        item["name"] == "九里堤北路1号附2号公共卫生间"
+        and item["image_url"] == "/restroom-scenes/restroom-street.svg"
+        for item in public_items
+    )
+
+    mall_response = client.get("/api/points", params={"keyword": "凯德广场金牛", "page_size": 20})
+    assert mall_response.status_code == 200
+    assert any(
+        item["name"] == "凯德广场金牛（交大路店B1洗手间）"
+        and item["image_url"] == "/restroom-scenes/restroom-mall.svg"
+        for item in mall_response.json()["items"]
+    )
+
+    park_response = client.get("/api/points", params={"keyword": "新金牛公园D区公共卫生间", "page_size": 20})
+    assert park_response.status_code == 200
+    assert any(
+        item["name"] == "新金牛公园D区公共卫生间"
+        and item["image_url"] == "/restroom-scenes/restroom-park.svg"
+        for item in park_response.json()["items"]
+    )
+
     headers = get_headers()
-
     admin_response = client.get(
         "/api/admin/points",
-        params={"keyword": "九里堤北路1号附2号公共卫生间", "status": "draft", "page_size": 20},
+        params={"keyword": "九里堤北路1号附2号公共卫生间", "status": "published", "page_size": 20},
         headers=headers,
     )
     assert admin_response.status_code == 200
-    admin_items = admin_response.json()["items"]
-    assert any(item["name"] == "九里堤北路1号附2号公共卫生间" for item in admin_items)
-
-    public_response = client.get("/api/points", params={"keyword": "九里堤北路1号附2号公共卫生间"})
-    assert public_response.status_code == 200
-    assert public_response.json()["total"] == 0
+    assert any(item["name"] == "九里堤北路1号附2号公共卫生间" for item in admin_response.json()["items"])
 
 
 def test_seed_data_does_not_duplicate_default_points():
