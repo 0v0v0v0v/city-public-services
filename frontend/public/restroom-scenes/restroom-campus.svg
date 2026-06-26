@@ -1,0 +1,21 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" fill="#EFF4F8"/>
+  <rect y="500" width="1200" height="220" fill="#9BBE8A"/>
+  <rect x="108" y="118" width="984" height="344" rx="28" fill="#C7674A"/>
+  <rect x="108" y="118" width="984" height="76" rx="28" fill="#8A3E2B"/>
+  <rect x="206" y="218" width="190" height="244" rx="20" fill="#F2F0EC"/>
+  <rect x="505" y="218" width="190" height="244" rx="20" fill="#F2F0EC"/>
+  <rect x="804" y="218" width="190" height="244" rx="20" fill="#F2F0EC"/>
+  <circle cx="372" cy="340" r="12" fill="#8A3E2B"/>
+  <circle cx="671" cy="340" r="12" fill="#8A3E2B"/>
+  <circle cx="970" cy="340" r="12" fill="#8A3E2B"/>
+  <rect x="518" y="60" width="164" height="84" rx="18" fill="#F4D481"/>
+  <text x="600" y="112" text-anchor="middle" fill="#8A3E2B" font-family="Arial, sans-serif" font-size="36" font-weight="700">WC</text>
+  <rect x="92" y="480" width="1016" height="28" fill="#D9DDDF"/>
+  <rect x="250" y="508" width="30" height="90" fill="#7E5D42"/>
+  <rect x="890" y="508" width="30" height="90" fill="#7E5D42"/>
+  <path d="M174 530C248 468 344 468 422 530" stroke="#D6E4D4" stroke-width="14" stroke-linecap="round"/>
+  <path d="M786 530C860 468 956 468 1034 530" stroke="#D6E4D4" stroke-width="14" stroke-linecap="round"/>
+  <text x="100" y="88" fill="#6E3525" font-family="Arial, sans-serif" font-size="38" font-weight="700">校园公共厕所</text>
+  <text x="100" y="126" fill="#6E3525" font-family="Arial, sans-serif" font-size="24">Campus service restroom</text>
+</svg>

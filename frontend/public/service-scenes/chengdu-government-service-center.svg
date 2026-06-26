@@ -1,0 +1,30 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" fill="#EEF3F8"/>
+  <rect y="520" width="1200" height="200" fill="#C8D4DF"/>
+  <rect x="118" y="122" width="964" height="358" rx="28" fill="#F8FAFC"/>
+  <rect x="118" y="122" width="964" height="92" rx="28" fill="#B9473F"/>
+  <rect x="210" y="246" width="160" height="234" fill="#D8E5F0"/>
+  <rect x="402" y="246" width="160" height="234" fill="#D8E5F0"/>
+  <rect x="594" y="246" width="160" height="234" fill="#D8E5F0"/>
+  <rect x="786" y="246" width="160" height="234" fill="#D8E5F0"/>
+  <rect x="210" y="228" width="736" height="24" fill="#F1D6B8"/>
+  <rect x="536" y="202" width="128" height="278" fill="#F4EFE7"/>
+  <circle cx="600" cy="170" r="26" fill="#F0C25B"/>
+  <path d="M600 146L606 162H623L609 172L615 188L600 178L585 188L591 172L577 162H594L600 146Z" fill="#B9473F"/>
+  <text x="600" y="178" text-anchor="middle" fill="#B9473F" font-family="Arial, sans-serif" font-size="16" font-weight="700">蓉</text>
+  <text x="600" y="180" text-anchor="middle" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="34" font-weight="700">政务服务中心</text>
+  <rect x="250" y="286" width="56" height="92" fill="#F8FAFC"/>
+  <rect x="442" y="286" width="56" height="92" fill="#F8FAFC"/>
+  <rect x="702" y="286" width="56" height="92" fill="#F8FAFC"/>
+  <rect x="826" y="286" width="56" height="92" fill="#F8FAFC"/>
+  <rect x="520" y="330" width="160" height="150" fill="#8FA8BF"/>
+  <rect x="548" y="356" width="104" height="124" fill="#DCE7F0"/>
+  <rect x="560" y="372" width="26" height="26" fill="#8FA8BF"/>
+  <rect x="614" y="372" width="26" height="26" fill="#8FA8BF"/>
+  <rect x="560" y="414" width="26" height="26" fill="#8FA8BF"/>
+  <rect x="614" y="414" width="26" height="26" fill="#8FA8BF"/>
+  <rect x="130" y="480" width="940" height="16" fill="#AABAC9"/>
+  <rect x="168" y="496" width="864" height="24" fill="#9EAFBF"/>
+  <text x="118" y="610" fill="#30485C" font-family="Arial, sans-serif" font-size="38" font-weight="700">成都市人民政府政务服务中心</text>
+  <text x="118" y="652" fill="#5A738A" font-family="Arial, sans-serif" font-size="24">City Government Service Center Scene</text>
+</svg>
